@@ -1,22 +1,35 @@
 import { bootstrap } from '@angular/platform-browser-dynamic';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
+
+@Injectable()
+export class TaskService {
+    tasks = ["First task", "Second Task", "Third Task"];
+}
 
 
 @Component({
     selector: 'tasks',
+    providers: [TaskService],
     template: `
-    <h4>This is the Tasks Component</h4> 
+    <h4>This is the Tasks Component</h4>
+    <span> {{taskService.tasks|json}} </span>
+    <ul>
+        <li *ngFor="let task of taskService.tasks">
+            {{ task }}
+        </li>
+    </ul>
     `
 })
 export class TasksComponent implements OnInit {
-
-    constructor() { }
-
-    ngOnInit() { 
-
-    }
+    
+    constructor( public taskService: TaskService) { }
+    
+    ngOnInit() { }
 
 }
+
+
+
 
 
 

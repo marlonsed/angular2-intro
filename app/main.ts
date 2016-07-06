@@ -1,10 +1,24 @@
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { Component, OnInit, Injectable } from '@angular/core';
+import { HTTP_PROVIDERS, Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class TaskService {
-    tasks = ["First task", "Second Task", "Third Task"];
+    tasks;
+
+    constructor(private _http: Http){}
+
+    getTasks(){
+        var aPromise = this._http.get("/tasks.json")
+        .map((response: Response) => response.json().data)
+        .toPromise()
+        aPromise.then(tasksFromServer => this.tasks = tasksFromServer);
+    }
 }
+
 
 
 @Component({
@@ -12,10 +26,9 @@ export class TaskService {
     providers: [TaskService],
     template: `
     <h4>This is the Tasks Component</h4>
-    <span> {{taskService.tasks|json}} </span>
     <ul>
         <li *ngFor="let task of taskService.tasks">
-            {{ task }}
+            {{ task.title }}
         </li>
     </ul>
     `
@@ -24,11 +37,11 @@ export class TasksComponent implements OnInit {
     
     constructor( public taskService: TaskService) { }
     
-    ngOnInit() { }
+    ngOnInit() { 
+        this.taskService.getTasks();
+    }
 
 }
-
-
 
 
 
@@ -42,6 +55,7 @@ export class TasksComponent implements OnInit {
     <tasks></tasks>
     `
 })
+
 export class AppComponent implements OnInit {
 
     constructor() { }
@@ -52,4 +66,4 @@ export class AppComponent implements OnInit {
 
 }
 
-bootstrap(AppComponent)
+bootstrap(AppComponent, [HTTP_PROVIDERS])
